@@ -11,7 +11,7 @@ public class CodeSmellVisualizationDataSingleton {
 	private static CandidateRefactoring[] candidates;
 	private static ArrayList<GodClassVisualizationData> godClassData = new ArrayList<GodClassVisualizationData>();
 	
-	static ArrayList<GodClassVisualizationData> getGodClasses(){
+	public static ArrayList<GodClassVisualizationData> getGodClasses(){
 		return godClassData;
 	}
 	
@@ -25,6 +25,10 @@ public class CodeSmellVisualizationDataSingleton {
 	
 	public static boolean removeGodClass(GodClassVisualizationData data){
 		return godClassData.remove(data);
+	}
+	
+	public static int countGodClasses(){
+		return godClassData.size();
 	}
 	
 	public static CandidateRefactoring[] getCandidates() {

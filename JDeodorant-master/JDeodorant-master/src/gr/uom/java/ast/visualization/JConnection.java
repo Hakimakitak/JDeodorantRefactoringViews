@@ -252,4 +252,110 @@ public class JConnection extends PolylineConnection {
 
 		return this;
 	}
+	
+	///////////
+	
+	public JConnection setLeftLeftAnchors(ClassFigure source, ClassFigure target) {
+		LeftAnchor sourceAnchor;
+		LeftAnchor targetAnchor;
+		
+		if (source.getLeftAnchor() != null)
+			sourceAnchor = source.getLeftAnchor();
+		else{
+			sourceAnchor = new LeftAnchor(source);
+			source.setLeftAnchor(sourceAnchor);
+		}
+		
+		if(target.getLeftAnchor() != null){
+			targetAnchor  = target.getLeftAnchor();
+		}
+		else {
+			targetAnchor  = new LeftAnchor(target);
+			target.setLeftAnchor(targetAnchor);
+		}
+		//LeftAnchor sourceAnchor = new LeftAnchor(source);
+		//LeftAnchor targetAnchor = new LeftAnchor(target);
+		this.setSourceAnchor(sourceAnchor);
+		this.setTargetAnchor(targetAnchor);
+
+		return this;		
+	}
+
+	public JConnection setRightRightAnchors(ClassFigure source, ClassFigure target) {
+		RightAnchor sourceAnchor;
+		RightAnchor targetAnchor;
+		
+		if (source.getRightAnchor() != null)
+			sourceAnchor = source.getRightAnchor();
+		else{
+			sourceAnchor = new RightAnchor(source);
+			source.setRightAnchor(sourceAnchor);
+		}
+		
+		if(target.getRightAnchor() != null){
+			targetAnchor  = target.getRightAnchor();
+		}
+		else {
+			targetAnchor  = new RightAnchor(target);
+			target.setRightAnchor(targetAnchor);
+		}
+
+		//RightAnchor sourceAnchor = new RightAnchor(source);
+		//RightAnchor targetAnchor = new RightAnchor(target);
+		this.setSourceAnchor(sourceAnchor);
+		this.setTargetAnchor(targetAnchor);
+
+		return this;		
+	}
+
+	public JConnection setRightLeftAnchors(ClassFigure source, ClassFigure target) {
+		RightAnchor sourceAnchor;
+		LeftAnchor targetAnchor;
+		
+		if (source.getRightAnchor() != null)
+			sourceAnchor = source.getRightAnchor();
+		else{
+			sourceAnchor = new RightAnchor(source);
+			source.setRightAnchor(sourceAnchor);
+		}
+		
+		if(target.getLeftAnchor() != null){
+			targetAnchor  = target.getLeftAnchor();
+		}
+		else {
+			targetAnchor  = new LeftAnchor(target);
+			target.setLeftAnchor(targetAnchor);
+		}
+		
+		this.setSourceAnchor(sourceAnchor);
+		this.setTargetAnchor(targetAnchor);
+
+		return this;		
+	}
+
+	public JConnection setLeftRightAnchors(ClassFigure source, ClassFigure target) {
+		LeftAnchor sourceAnchor;
+		RightAnchor targetAnchor;
+		
+		if (source.getLeftAnchor() != null)
+			sourceAnchor = source.getLeftAnchor();
+		else{
+			sourceAnchor = new LeftAnchor(source);
+			source.setLeftAnchor(sourceAnchor);
+		}
+		
+		if(target.getRightAnchor() != null){
+			targetAnchor  = target.getRightAnchor();
+		}
+		else {
+			targetAnchor  = new RightAnchor(target);
+			target.setRightAnchor(targetAnchor);
+		}
+		//LeftAnchor sourceAnchor = new LeftAnchor(source);
+		//RightAnchor targetAnchor = new RightAnchor(target);
+		this.setSourceAnchor(sourceAnchor);
+		this.setTargetAnchor(targetAnchor);
+
+		return this;		
+	}
 }
