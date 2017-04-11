@@ -4,6 +4,7 @@ import gr.uom.java.ast.visualization.FeatureEnvyDiagram;
 import gr.uom.java.ast.visualization.FeatureEnvyVisualizationData;
 import gr.uom.java.ast.visualization.GodClassDiagram2;
 import gr.uom.java.ast.visualization.GodClassVisualizationData;
+import gr.uom.java.ast.visualization.RefactoringDiagram;
 import gr.uom.java.ast.visualization.ZoomInputAction;
 import gr.uom.java.ast.visualization.VisualizationData;
 import gr.uom.java.ast.visualization.ZoomAction;
@@ -21,6 +22,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ltk.core.refactoring.RefactoringDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -49,12 +51,19 @@ public class CodeSmellVisualization extends ViewPart {
 
 		VisualizationData data = CodeSmellVisualizationDataSingleton.getData();
 
-		if(data != null) {
-			if(data instanceof GodClassVisualizationData) {
-				GodClassDiagram2 diagram = new GodClassDiagram2((GodClassVisualizationData)data);
+		if(data != null || CodeSmellVisualizationDataSingleton.displayRefactoringDiagram) {
+			if(CodeSmellVisualizationDataSingleton.displayRefactoringDiagram){
+				CodeSmellVisualizationDataSingleton.displayRefactoringDiagram = false;
+				RefactoringDiagram diagram = new RefactoringDiagram();
 				root= diagram.getRoot();
 			}
-			if(data instanceof FeatureEnvyVisualizationData) {
+			else if(data instanceof GodClassVisualizationData) {
+				//
+				GodClassDiagram2 diagram = new GodClassDiagram2((GodClassVisualizationData)data);
+				//RefactoringDiagram diagram = new RefactoringDiagram();
+				root= diagram.getRoot();
+			}
+			else if(data instanceof FeatureEnvyVisualizationData) {
 				FeatureEnvyDiagram diagram = new FeatureEnvyDiagram((FeatureEnvyVisualizationData)data);
 				root= diagram.getRoot();
 			}

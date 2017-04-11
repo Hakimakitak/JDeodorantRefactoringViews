@@ -15,7 +15,6 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 import gr.uom.java.ast.ClassObject;
-import gr.uom.java.ast.decomposition.matching.conditional.Pair;
 import gr.uom.java.jdeodorant.refactoring.views.CodeSmellVisualizationDataSingleton;
 
 public class RefactoringDiagram {
@@ -41,8 +40,8 @@ public class RefactoringDiagram {
 	int gridXInc = 3;
 	int gridYInc = 1;
 	int gap = 300;
-	int xGap = 300;
-	int yGap = 300;
+	int xGap = 150;
+	int yGap = 50;
 	
 	public RefactoringDiagram(){
 		root = new ScalableFreeformLayeredPane();
@@ -58,8 +57,10 @@ public class RefactoringDiagram {
 		if(CodeSmellVisualizationDataSingleton.countGodClasses() > 0){
 			ClassFigure extractedClasses = new ClassFigure("Extracted Classes", DecorationConstants.classColor);
 			extractedClasses.setToolTip(new Label("Extracted Classes"));
-			primary.add(extractedClasses, getNewClassRectangle());
-			
+			//primary.add(extractedClasses, getNewClassRectangle());
+			primary.add(extractedClasses, new Rectangle(startPointX, startPointY, classWidth, -1));
+			curGridX = 1;
+						
 			ArrayList<GodClassVisualizationData> candidates = CodeSmellVisualizationDataSingleton.getGodClasses();
 			HashMap<ClassObject, ClassFigure> activeClasses = new HashMap<ClassObject, ClassFigure>();
 			HashMap<ClassFigure, Integer> activeFigures = new HashMap<ClassFigure, Integer>();
@@ -74,7 +75,8 @@ public class RefactoringDiagram {
 				} else {
 					ClassFigure classFigure = activeClasses.get(sourceClass);
 					int curRefactors = activeFigures.get(classFigure);
-					activeFigures.put(classFigure, curRefactors++);
+					curRefactors++;
+					activeFigures.put(classFigure, curRefactors);
 				}
 			}
 			Iterator it = activeFigures.entrySet().iterator();
@@ -83,11 +85,9 @@ public class RefactoringDiagram {
 		        ClassFigure figure = (ClassFigure)pair.getKey();
 		        primary.add(figure, getNewClassRectangle());
 				JConnection connection = figure.addLeftRightConnection(ConnectionType.READ_FIELD_TARGET, extractedClasses, (Integer) pair.getValue());
+				connection.setReadStyle();
 				connections.add(connection);		
-						//		JConnection connection = source.addRightLeftConnection(ConnectionType.READ_FIELD_TARGET, extractedClass, 1);
-
-		        
-		        it.remove(); // avoids a ConcurrentModificationException
+				it.remove(); // avoids a ConcurrentModificationException
 		    }
 		    root.add(connections, "Connections");
 		}
@@ -98,10 +98,16 @@ public class RefactoringDiagram {
 		int y = startPointY + (curGridY * yGap);
 		
 		//Update this so something more visually appealing later
-		if(curGridX > curGridY) curGridY++;
-		else curGridX++;
+		//if(curGridX > curGridY) curGridY++;
+		//else curGridX++;
+		curGridY++;
 		
 		return new Rectangle(x, y, classWidth, -1);
+	}
+
+	public ScalableFreeformLayeredPane getRoot() {
+		// TODO Auto-generated method stub
+		return root;
 	}
 
 	

@@ -10,6 +10,9 @@ public class CodeSmellVisualizationDataSingleton {
 	private static VisualizationData data;
 	private static CandidateRefactoring[] candidates;
 	private static ArrayList<GodClassVisualizationData> godClassData = new ArrayList<GodClassVisualizationData>();
+
+	public static boolean displayRefactoringDiagram = false;
+	
 	
 	public static ArrayList<GodClassVisualizationData> getGodClasses(){
 		return godClassData;

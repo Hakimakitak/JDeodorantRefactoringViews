@@ -110,6 +110,7 @@ public class GodClass extends ViewPart {
 	private Action doubleClickAction;
 	private Action saveResultsAction;
 	private Action packageExplorerAction;
+	private Action visualizeCandidatesAction;
 	private ExtractClassCandidateGroup[] candidateRefactoringTable;
 	private IJavaProject selectedProject;
 	private IJavaProject activeProject;
@@ -117,6 +118,7 @@ public class GodClass extends ViewPart {
 	private IPackageFragment selectedPackageFragment;
 	private ICompilationUnit selectedCompilationUnit;
 	private IType selectedType;
+	
 
 	class ViewContentProvider implements ITreeContentProvider {
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
@@ -580,6 +582,7 @@ public class GodClass extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(identifyBadSmellsAction);
+		manager.add(visualizeCandidatesAction);
 		manager.add(applyRefactoringAction);
 		manager.add(saveResultsAction);
 		manager.add(packageExplorerAction);
@@ -611,6 +614,25 @@ public class GodClass extends ViewPart {
 				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		identifyBadSmellsAction.setEnabled(false);
 
+		visualizeCandidatesAction = new Action(){
+			public void run(){
+				CodeSmellVisualizationDataSingleton.displayRefactoringDiagram = true;
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IViewPart viewPart = page.findView(CodeSmellVisualization.ID);
+				if(viewPart != null)
+					page.hideView(viewPart);
+				try {
+					page.showView(CodeSmellVisualization.ID);
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		visualizeCandidatesAction.setToolTipText("Visualize Selected Candidates");
+		visualizeCandidatesAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		visualizeCandidatesAction.setEnabled(true);
+		
 		saveResultsAction = new Action() {
 			public void run() {
 				saveResults();
