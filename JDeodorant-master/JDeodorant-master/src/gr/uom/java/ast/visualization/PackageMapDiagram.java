@@ -364,7 +364,7 @@ public class PackageMapDiagram {
 			min = Math.min(numOfAttributes, numOfMethods);
 		}
 		String name = topLevelTypeDeclaration.resolveBinding().getQualifiedName();
-
+		
 
 		final PMClassFigure classFigure = new PMClassFigure(name, numOfAttributes, numOfMethods);
 		classFigure.addMouseMotionListener(new MouseMotionListener(){

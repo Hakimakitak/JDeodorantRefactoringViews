@@ -42,6 +42,7 @@ public class RefactoringDiagram {
 	int gap = 300;
 	int xGap = 150;
 	int yGap = 50;
+	int curY = 0;
 	
 	public RefactoringDiagram(){
 		root = new ScalableFreeformLayeredPane();
@@ -51,15 +52,15 @@ public class RefactoringDiagram {
 		root.add(primary,"Primary");
 		connections = new ConnectionLayer();
 		
-		//if there are god classes, make an Extracted Class class 
-		//for each god class create a source class. arrange them 3x1
-		//for each extraction, add a line to extract. for now we'll show no information
+		//for each god class create a source class and a line to an extracted class
 		if(CodeSmellVisualizationDataSingleton.countGodClasses() > 0){
+			/*
 			ClassFigure extractedClasses = new ClassFigure("Extracted Classes", DecorationConstants.classColor);
 			extractedClasses.setToolTip(new Label("Extracted Classes"));
 			//primary.add(extractedClasses, getNewClassRectangle());
 			primary.add(extractedClasses, new Rectangle(startPointX, startPointY, classWidth, -1));
 			curGridX = 1;
+			*/
 						
 			ArrayList<GodClassVisualizationData> candidates = CodeSmellVisualizationDataSingleton.getGodClasses();
 			HashMap<ClassObject, ClassFigure> activeClasses = new HashMap<ClassObject, ClassFigure>();
@@ -68,7 +69,7 @@ public class RefactoringDiagram {
 			for(GodClassVisualizationData candidate : candidates){
 				ClassObject sourceClass = candidate.getSourceClass();
 				if(!activeClasses.containsKey(sourceClass)){
-					ClassFigure classFigure = new ClassFigure(candidate.getSourceClass().getName(), DecorationConstants.classColor);
+					ClassFigure classFigure = new ClassFigure(candidate.getSourceClass().getClassName(), DecorationConstants.classColor);
 					classFigure.setToolTip(new Label(candidate.getSourceClass().getName()));
 					activeClasses.put(sourceClass, classFigure);
 					activeFigures.put(classFigure, 1);
@@ -79,12 +80,20 @@ public class RefactoringDiagram {
 					activeFigures.put(classFigure, curRefactors);
 				}
 			}
+			
 			Iterator it = activeFigures.entrySet().iterator();
 		    while (it.hasNext()) {
 		    	Map.Entry pair = (Map.Entry)it.next();
-		        ClassFigure figure = (ClassFigure)pair.getKey();
-		        primary.add(figure, getNewClassRectangle());
-				JConnection connection = figure.addLeftRightConnection(ConnectionType.READ_FIELD_TARGET, extractedClasses, (Integer) pair.getValue());
+		        ClassFigure godClassfigure = (ClassFigure)pair.getKey();
+		        
+		        primary.add(godClassfigure, getNewClassRectangle(0, curY));
+		        
+		        ClassFigure extractedClassFigure = new ClassFigure("Extracted Class", DecorationConstants.classColor);
+		        extractedClassFigure.setToolTip(new Label("Extracted Class"));
+		        primary.add(extractedClassFigure, getNewClassRectangle(1, curY));
+				curY++;        
+		        
+				JConnection connection = godClassfigure.addRightLeftConnection(ConnectionType.READ_FIELD_TARGET, extractedClassFigure, (Integer) pair.getValue());
 				connection.setReadStyle();
 				connections.add(connection);		
 				it.remove(); // avoids a ConcurrentModificationException
@@ -93,14 +102,14 @@ public class RefactoringDiagram {
 		}
 	}
 	
-	Rectangle getNewClassRectangle(){
-		int x = startPointX + (curGridX * (classWidth + xGap));
-		int y = startPointY + (curGridY * yGap);
+	Rectangle getNewClassRectangle(int curX, int curY){
+		int x = startPointX + (curX * (classWidth + xGap));
+		int y = startPointY + (curY * yGap);
 		
 		//Update this so something more visually appealing later
 		//if(curGridX > curGridY) curGridY++;
 		//else curGridX++;
-		curGridY++;
+		//curGridY++;
 		
 		return new Rectangle(x, y, classWidth, -1);
 	}

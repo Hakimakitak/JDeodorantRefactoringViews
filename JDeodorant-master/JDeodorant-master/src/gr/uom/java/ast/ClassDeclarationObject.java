@@ -72,6 +72,11 @@ public abstract class ClassDeclarationObject {
 	public String getName() {
 		return name;
 	}
+	
+	public String getClassName(){
+		String[] splitName = name.split("\\.");
+		return splitName[splitName.length-1];
+	}
 
 	public boolean isGeneratedByParserGenenator() {
 		for(CommentObject comment : commentList) {

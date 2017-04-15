@@ -29,7 +29,7 @@ public class ClassFigure extends Figure {
 		setOpaque(true);
 
 		Label className = new Label(name, DecorationConstants.CLASS);
-		className.setToolTip(new Label(name));
+		//className.setToolTip(new Label(name));
 		className.setFont(DecorationConstants.classFont);
 
 		add(className);
