@@ -1,8 +1,14 @@
 package gr.uom.java.jdeodorant.refactoring.views;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import gr.uom.java.ast.visualization.DecorationConstants;
 import gr.uom.java.ast.visualization.GodClassInformationControlCreator;
@@ -45,12 +51,17 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.IProgressService;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class CodeSmellPackageExplorer extends ViewPart {
 	public static final String ID = "gr.uom.java.jdeodorant.views.CodeSmellPackageExplorer";
@@ -170,6 +181,46 @@ public class CodeSmellPackageExplorer extends ViewPart {
 		SearchInputAction searchAction = new SearchInputAction();
 		searchAction.setText("Search");
 		manager.add(searchAction);
+		
+		///
+		
+		Action importXML = new Action("Import metrics") {
+			public void run(){
+		        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+				   dialog.setFilterExtensions(new String [] {"*.xml"});
+				   dialog.setFilterPath("c:\\temp");
+				   String result = dialog.open();
+				   
+				   File outFile = new File(result);
+					DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder dBuilder;
+					try {
+						dBuilder = dbFactory.newDocumentBuilder();
+						Document doc = dBuilder.parse(outFile);
+						NodeList nList = doc.getElementsByTagName("Metric");
+						for(int i=0; i<nList.getLength(); i++){
+							NodeList children1 = nList.item(i).getChildNodes();
+							for(int j=0; i<children1.getLength(); j++){
+								if(children1.item(j).getNodeName().equals("Values")){
+									int k = 0;
+								}
+							}
+						}
+					} catch (ParserConfigurationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SAXException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			};
+		};
+		importXML.setText("Import metrics");
+		manager.add(importXML);
 
 	}
 

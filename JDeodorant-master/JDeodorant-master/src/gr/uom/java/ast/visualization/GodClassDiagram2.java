@@ -180,8 +180,6 @@ public class GodClassDiagram2 {
 						connectionList.add(connection);
 						connections.add(connection);
 					}
-
-
 				}
 
 				if(!contains)	{

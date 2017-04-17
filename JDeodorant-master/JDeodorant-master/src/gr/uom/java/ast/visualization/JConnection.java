@@ -201,6 +201,23 @@ public class JConnection extends PolylineConnection {
 
 		return this;
 	}
+	
+	public PolylineConnection setLabel(String label){
+
+		Label l;
+		if(!label.isEmpty()){
+			l = new Label(label);
+			ConnectionLocator locator = new ConnectionLocator(this, ConnectionLocator.MIDDLE);
+			//locator.setGap(5);
+			l.setFont(DecorationConstants.normalFont);
+			l.setForegroundColor(ColorConstants.black);
+			this.add(l,locator);
+			this.label=l;
+			this.locator = locator;
+		}
+
+		return this;
+	}
 
 	public PolylineConnection setSlightBendRouter(){
 		BendpointConnectionRouter router = new BendpointConnectionRouter();

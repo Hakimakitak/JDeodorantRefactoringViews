@@ -2,7 +2,9 @@ package gr.uom.java.ast.visualization;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,7 +16,10 @@ import org.eclipse.draw2d.ScalableFreeformLayeredPane;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
+
 import gr.uom.java.ast.ClassObject;
+import gr.uom.java.ast.FieldObject;
+import gr.uom.java.ast.MethodObject;
 import gr.uom.java.jdeodorant.refactoring.views.CodeSmellVisualizationDataSingleton;
 
 public class RefactoringDiagram {
@@ -27,7 +32,7 @@ public class RefactoringDiagram {
 	
 	int sourceClassWidth = 200;
 	int targetClassWidth = 200;
-	int classWidth = 200;
+	int classWidth = 300;
 	int targetSectionWidth = targetClassWidth/3;
 	int startPointX = 100;
 	int startPointY = 50;
@@ -62,9 +67,9 @@ public class RefactoringDiagram {
 			curGridX = 1;
 			*/
 						
-			ArrayList<GodClassVisualizationData> candidates = CodeSmellVisualizationDataSingleton.getGodClasses();
+			ArrayList<GodClassVisualizationData> candidates = CodeSmellVisualizationDataSingleton.getGodClassData();
 			HashMap<ClassObject, ClassFigure> activeClasses = new HashMap<ClassObject, ClassFigure>();
-			HashMap<ClassFigure, Integer> activeFigures = new HashMap<ClassFigure, Integer>();
+			HashMap<ClassFigure, ArrayList<GodClassVisualizationData>> activeFigures = new HashMap<ClassFigure, ArrayList<GodClassVisualizationData>>();
 			
 			for(GodClassVisualizationData candidate : candidates){
 				ClassObject sourceClass = candidate.getSourceClass();
@@ -72,12 +77,14 @@ public class RefactoringDiagram {
 					ClassFigure classFigure = new ClassFigure(candidate.getSourceClass().getClassName(), DecorationConstants.classColor);
 					classFigure.setToolTip(new Label(candidate.getSourceClass().getName()));
 					activeClasses.put(sourceClass, classFigure);
-					activeFigures.put(classFigure, 1);
+					ArrayList<GodClassVisualizationData> selectedCandidates = new ArrayList<GodClassVisualizationData>();
+					selectedCandidates.add(candidate);
+					activeFigures.put(classFigure, selectedCandidates);
 				} else {
 					ClassFigure classFigure = activeClasses.get(sourceClass);
-					int curRefactors = activeFigures.get(classFigure);
-					curRefactors++;
-					activeFigures.put(classFigure, curRefactors);
+					ArrayList<GodClassVisualizationData> selectedCandidates = activeFigures.get(classFigure);
+					selectedCandidates.add(candidate);
+					activeFigures.put(classFigure, selectedCandidates);
 				}
 			}
 			
@@ -87,13 +94,60 @@ public class RefactoringDiagram {
 		        ClassFigure godClassfigure = (ClassFigure)pair.getKey();
 		        
 		        primary.add(godClassfigure, getNewClassRectangle(0, curY));
+				ArrayList<GodClassVisualizationData> selectedCandidates = (ArrayList<GodClassVisualizationData>) pair.getValue();
 		        
-		        ClassFigure extractedClassFigure = new ClassFigure("Extracted Class", DecorationConstants.classColor);
+				String extractedClasslabel;
+		        if(selectedCandidates.size() == 1) extractedClasslabel = "Extracted Class";
+		        else extractedClasslabel = selectedCandidates.size() + " Extracted Classes";
+		        ClassFigure extractedClassFigure = new ClassFigure(extractedClasslabel, DecorationConstants.classColor);
 		        extractedClassFigure.setToolTip(new Label("Extracted Class"));
 		        primary.add(extractedClassFigure, getNewClassRectangle(1, curY));
 				curY++;        
 		        
-				JConnection connection = godClassfigure.addRightLeftConnection(ConnectionType.READ_FIELD_TARGET, extractedClassFigure, (Integer) pair.getValue());
+				//identify any conflicts
+				Set<GodClassVisualizationData> validCandidates = new HashSet<GodClassVisualizationData>();
+				Set<GodClassVisualizationData> invalidCandidates = new HashSet<GodClassVisualizationData>();
+				Set<MethodObject> allMethods = new HashSet<MethodObject>();
+				Set<MethodObject> problemMethods = new HashSet<MethodObject>();
+				Set<FieldObject> allFields = new HashSet<FieldObject>();
+				Set<FieldObject> problemFields = new HashSet<FieldObject>();
+				for(GodClassVisualizationData candidate : selectedCandidates){
+					boolean validCandidate = true;
+					Set<MethodObject> methods = candidate.getExtractedMethods();
+					for(MethodObject method : methods){
+						if(allMethods.contains(method)){
+							validCandidate = false;
+							problemMethods.add(method);
+						}
+						allMethods.add(method);
+					}
+					
+					Set<FieldObject> fields = candidate.getExtractedFields();
+					for(FieldObject field : fields){
+						if(allFields.contains(field)){
+							validCandidate = false;
+							problemFields.add(field);
+						}
+						allFields.add(field);
+					}
+					
+					if(validCandidate) validCandidates.add(candidate);
+					else invalidCandidates.add(candidate);
+				}
+				
+				//String label = validCandidates.size() + "/" + (selectedCandidates.size());
+				String label = (problemFields.size()+problemMethods.size()) + "\\" + (allFields.size()+allMethods.size()); 
+				String toolTip = "Methods Extracted to Multiple Classes:";
+				for(MethodObject m : problemMethods){
+					toolTip += "\n- " + m.getName();
+				}
+				toolTip += "\n\nFields Extracted to Multiple Classes:";
+				for(FieldObject f : problemFields){
+					toolTip += "\n- " + f.getName();
+				}
+						
+						
+				JConnection connection = godClassfigure.addRightLeftConnection(ConnectionType.READ_FIELD_TARGET, extractedClassFigure, label, toolTip);
 				connection.setReadStyle();
 				connections.add(connection);		
 				it.remove(); // avoids a ConcurrentModificationException

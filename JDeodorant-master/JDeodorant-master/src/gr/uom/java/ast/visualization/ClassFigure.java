@@ -124,11 +124,11 @@ public class ClassFigure extends Figure {
 		return outgoingConnections;
 	}
 	
-	public JConnection addLeftLeftConnection(ConnectionType type, ClassFigure label, Integer occurences, int bendHeight){
+	public JConnection addLeftLeftConnection(ConnectionType type, ClassFigure figure, Integer occurences, int bendHeight){
 
 		JConnection connection = new JConnection(type);
 
-		connection.setLeftLeftAnchors(this, label);
+		connection.setLeftLeftAnchors(this, figure);
 
 		//connection.setSourceBendRouter(bendHeight, classWidth);
 		connection.setFullBendRouter(bendHeight);
@@ -139,11 +139,11 @@ public class ClassFigure extends Figure {
 		return connection;
 	}
 
-	public JConnection addRightRightConnection(ConnectionType type, ClassFigure label, Integer occurences, int bendHeight){
+	public JConnection addRightRightConnection(ConnectionType type, ClassFigure figure, Integer occurences, int bendHeight){
 
 		JConnection connection = new JConnection(type);
 
-		connection.setRightRightAnchors(this, label);
+		connection.setRightRightAnchors(this, figure);
 
 		//connection.setSourceBendRouter(-bendHeight, -classWidth);
 		connection.setFullBendRouter(-bendHeight);
@@ -154,23 +154,25 @@ public class ClassFigure extends Figure {
 		return connection;
 	}
 
-	public JConnection addRightLeftConnection(ConnectionType type, ClassFigure label, Integer occurences){
+	public JConnection addRightLeftConnection(ConnectionType type, ClassFigure figure, String label, String toolTip){
 
 		JConnection connection = new JConnection(type);
-		connection.setRightLeftAnchors(this, label);
-		connection.setLabel(occurences);
-
+		connection.setRightLeftAnchors(this, figure);
+		connection.setLabel(label);
+		connection.setToolTip(new Label(toolTip));
+		
 		outgoingConnections.add(connection);
 		return connection;
 	}
 
-	public JConnection addLeftRightConnection(ConnectionType type,ClassFigure label, Integer occurences){
+	public JConnection addLeftRightConnection(ConnectionType type, ClassFigure figure, Integer occurences){
 
 		JConnection connection = new JConnection(type);
 
-		connection.setLeftRightAnchors(this, label);
+		connection.setLeftRightAnchors(this, figure);
 
 		connection.setLabel(occurences);
+		
 		outgoingConnections.add(connection);
 		return connection;
 	}

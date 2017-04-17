@@ -209,7 +209,7 @@ public class GodClass extends ViewPart {
 				int candidateCount = candidates.size();
 				int candidatesSelected = 0;
 				for(ExtractClassCandidateRefactoring candidate : candidates){
-					if(CodeSmellVisualizationDataSingleton.getGodClasses().contains(candidate.getGodClassVisualizationData())){
+					if(CodeSmellVisualizationDataSingleton.getGodClassData().contains(candidate.getGodClassVisualizationData())){
 						candidatesSelected++;
 					}
 				}
@@ -233,7 +233,7 @@ public class GodClass extends ViewPart {
 					}
 					break;
 				case 5:
-					ArrayList<GodClassVisualizationData> godClasses = CodeSmellVisualizationDataSingleton.getGodClasses();
+					ArrayList<GodClassVisualizationData> godClasses = CodeSmellVisualizationDataSingleton.getGodClassData();
 					GodClassVisualizationData gcvData = ((ExtractClassCandidateRefactoring)obj).getGodClassVisualizationData();
 					if(godClasses.contains(gcvData)){
 						image = Activator.getImageDescriptor("/icons/" + "checked.png").createImage();
@@ -519,7 +519,7 @@ public class GodClass extends ViewPart {
 					ArrayList<ExtractClassCandidateRefactoring> candidates = ((ExtractClassCandidateGroup)element).getCandidates();
 					for(ExtractClassCandidateRefactoring candidate : candidates){
 						GodClassVisualizationData gcvData = candidate.getGodClassVisualizationData();
-						if(!CodeSmellVisualizationDataSingleton.getGodClasses().contains(gcvData)){
+						if(!CodeSmellVisualizationDataSingleton.getGodClassData().contains(gcvData)){
 							allSelected = false;
 							break;
 						}
@@ -534,7 +534,7 @@ public class GodClass extends ViewPart {
 					}
 				} else if (element instanceof ExtractClassCandidateRefactoring){
 					GodClassVisualizationData gcvData = ((ExtractClassCandidateRefactoring)element).getGodClassVisualizationData();
-					if(CodeSmellVisualizationDataSingleton.getGodClasses().contains(gcvData)){
+					if(CodeSmellVisualizationDataSingleton.getGodClassData().contains(gcvData)){
 						CodeSmellVisualizationDataSingleton.removeGodClass(gcvData);
 					} else {
 						CodeSmellVisualizationDataSingleton.addGodClass(gcvData);

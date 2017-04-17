@@ -2,6 +2,7 @@ package gr.uom.java.jdeodorant.refactoring.views;
 
 import java.util.ArrayList;
 
+import gr.uom.java.ast.visualization.FeatureEnvyVisualizationData;
 import gr.uom.java.ast.visualization.GodClassVisualizationData;
 import gr.uom.java.ast.visualization.VisualizationData;
 import gr.uom.java.distance.CandidateRefactoring;
@@ -10,12 +11,17 @@ public class CodeSmellVisualizationDataSingleton {
 	private static VisualizationData data;
 	private static CandidateRefactoring[] candidates;
 	private static ArrayList<GodClassVisualizationData> godClassData = new ArrayList<GodClassVisualizationData>();
-
+	private static ArrayList<FeatureEnvyVisualizationData> featureEnvyData = new ArrayList<FeatureEnvyVisualizationData>();
+	
 	public static boolean displayRefactoringDiagram = false;
 	
 	
-	public static ArrayList<GodClassVisualizationData> getGodClasses(){
+	public static ArrayList<GodClassVisualizationData> getGodClassData(){
 		return godClassData;
+	}
+	
+	public static ArrayList<FeatureEnvyVisualizationData> getFeatureEnvyData(){
+		return featureEnvyData;
 	}
 	
 	public static boolean addGodClass(GodClassVisualizationData data){
@@ -26,12 +32,28 @@ public class CodeSmellVisualizationDataSingleton {
 		return true;
 	}
 	
+	public static boolean addFeatureEnvy(FeatureEnvyVisualizationData data){
+		if(featureEnvyData.contains(data)){
+			return false;
+		}
+		featureEnvyData.add(data);
+		return true;
+	}
+	
 	public static boolean removeGodClass(GodClassVisualizationData data){
 		return godClassData.remove(data);
 	}
 	
+	public static boolean removeFeatureEnvy(FeatureEnvyVisualizationData data){
+		return featureEnvyData.remove(data);
+	}
+	
 	public static int countGodClasses(){
 		return godClassData.size();
+	}
+	
+	public static int countFeatureEnvy(){
+		return featureEnvyData.size();
 	}
 	
 	public static CandidateRefactoring[] getCandidates() {
