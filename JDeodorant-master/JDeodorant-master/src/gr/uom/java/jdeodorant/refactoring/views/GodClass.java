@@ -239,7 +239,6 @@ public class GodClass extends ViewPart {
 						image = Activator.getImageDescriptor("/icons/" + "checked.png").createImage();
 					} else {
 						image = Activator.getImageDescriptor("/icons/" + "unchecked.png").createImage();
-
 					}
 					break;
 				default:
@@ -505,10 +504,11 @@ public class GodClass extends ViewPart {
 			
 			public void mouseDown(MouseEvent e) {
 				int xStart=0;
+				TreeColumn[] columns = treeViewer.getTree().getColumns();
 				for(int i=0; i<5; i++){
-					xStart += treeViewer.getTree().getColumns()[i].getWidth();
+					xStart += columns[i].getWidth();
 				}
-				int xEnd = xStart + treeViewer.getTree().getColumns()[5].getWidth();
+				int xEnd = xStart + columns[5].getWidth();
 				
 				if(e.x >= xStart && e.x <= xEnd){
 				

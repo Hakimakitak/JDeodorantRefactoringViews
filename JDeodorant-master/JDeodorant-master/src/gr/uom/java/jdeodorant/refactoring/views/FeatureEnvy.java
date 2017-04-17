@@ -5,9 +5,12 @@ import gr.uom.java.ast.ClassObject;
 import gr.uom.java.ast.CompilationErrorDetectedException;
 import gr.uom.java.ast.CompilationUnitCache;
 import gr.uom.java.ast.SystemObject;
+import gr.uom.java.ast.visualization.FeatureEnvyVisualizationData;
+import gr.uom.java.ast.visualization.GodClassVisualizationData;
 import gr.uom.java.distance.CandidateRefactoring;
 import gr.uom.java.distance.MoveMethodCandidateRefactoring;
 import gr.uom.java.distance.DistanceMatrix;
+import gr.uom.java.distance.ExtractClassCandidateRefactoring;
 import gr.uom.java.distance.MySystem;
 import gr.uom.java.jdeodorant.preferences.PreferenceConstants;
 import gr.uom.java.jdeodorant.refactoring.Activator;
@@ -56,6 +59,8 @@ import org.eclipse.jface.text.source.AnnotationModel;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.window.ToolTip;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -104,6 +109,7 @@ public class FeatureEnvy extends ViewPart {
 	private static final String MESSAGE_DIALOG_TITLE = "Feature Envy";
 	private TableViewer tableViewer;
 	private Action identifyBadSmellsAction;
+	private Action visualizeCandidatesAction;
 	private Action applyRefactoringAction;
 	private Action doubleClickAction;
 	private Action saveResultsAction;
@@ -173,6 +179,7 @@ public class FeatureEnvy extends ViewPart {
 		public Image getColumnImage(Object obj, int index) {
 			CandidateRefactoring entry = (CandidateRefactoring)obj;
 			int rate = -1;
+			
 			if(entry instanceof MoveMethodCandidateRefactoring) {
 				Integer userRate = ((MoveMethodCandidateRefactoring)entry).getUserRate();
 				if(userRate != null)
@@ -184,6 +191,16 @@ public class FeatureEnvy extends ViewPart {
 				if(rate != -1) {
 					image = Activator.getImageDescriptor("/icons/" + String.valueOf(rate) + ".jpg").createImage();
 				}
+				break;
+			case 5:
+				ArrayList<FeatureEnvyVisualizationData> featureEnvyData = CodeSmellVisualizationDataSingleton.getFeatureEnvyData();
+				FeatureEnvyVisualizationData fevData = ((MoveMethodCandidateRefactoring)entry).getFeatureEnvyVisualizationData();
+				if (featureEnvyData.contains(fevData)){
+					image = Activator.getImageDescriptor("/icons/" + "checked.png").createImage();
+				} else {
+					image = Activator.getImageDescriptor("/icons/" + "unchecked.png").createImage();
+				}
+				break;
 			default:
 				break;
 			}
@@ -200,6 +217,8 @@ public class FeatureEnvy extends ViewPart {
 			return candidate1.compareTo(candidate2);
 		}
 	}
+	
+	
 
 	private ISelectionListener selectionListener = new ISelectionListener() {
 		public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {
@@ -272,6 +291,7 @@ public class FeatureEnvy extends ViewPart {
 		layout.addColumnData(new ColumnWeightData(40, true));
 		layout.addColumnData(new ColumnWeightData(40, true));
 		layout.addColumnData(new ColumnWeightData(20, true));
+		layout.addColumnData(new ColumnWeightData(20, true));
 		tableViewer.getTable().setLayout(layout);
 		tableViewer.getTable().setLinesVisible(true);
 		tableViewer.getTable().setHeaderVisible(true);
@@ -296,6 +316,11 @@ public class FeatureEnvy extends ViewPart {
 		column4.setText("Rate it!");
 		column4.setResizable(true);
 		column4.pack();
+		
+		TableColumn column5 = new TableColumn(tableViewer.getTable(),SWT.LEFT);
+		column5.setText("Implement?");
+		column5.setResizable(true);
+		column5.pack();
 		
 		tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -390,6 +415,39 @@ public class FeatureEnvy extends ViewPart {
 			}
 		});
 
+		tableViewer.getTable().addMouseListener(new MouseListener() {
+			
+			public void mouseUp(MouseEvent e) {			
+			}
+			
+			public void mouseDown(MouseEvent e) {
+				int xStart = 0;
+				TableColumn[] columns = tableViewer.getTable().getColumns();
+				for(int i=0; i<5; i++){
+					xStart += columns[i].getWidth();
+				}
+				int xEnd = xStart + columns[5].getWidth();
+				
+				if(e.x >= xStart && e.x <= xEnd){
+					StructuredSelection selection = (StructuredSelection) tableViewer.getSelection();
+					Object element = selection.getFirstElement();
+					if(element instanceof MoveMethodCandidateRefactoring){
+						FeatureEnvyVisualizationData fevData = ((MoveMethodCandidateRefactoring)element).getFeatureEnvyVisualizationData();
+						if(CodeSmellVisualizationDataSingleton.getFeatureEnvyData().contains(fevData)){
+							CodeSmellVisualizationDataSingleton.removeFeatureEnvy(fevData);
+						} else {
+							CodeSmellVisualizationDataSingleton.addFeatureEnvy(fevData);
+						}
+						tableViewer.refresh();
+					}
+				}
+				
+			}
+			
+			public void mouseDoubleClick(MouseEvent e) {				
+			}
+		});
+		
 		makeActions();
 		hookDoubleClickAction();
 		contributeToActionBars();
@@ -416,6 +474,8 @@ public class FeatureEnvy extends ViewPart {
 		toolTip.setHideOnMouseDown(false);
 		toolTip.activate();
 	}
+	
+	
 
 	private Menu getRightClickMenu(TableViewer tableViewer, final MoveMethodCandidateRefactoring candidateRefactoring) {
 		Menu popupMenu = new Menu(tableViewer.getControl());
@@ -447,6 +507,7 @@ public class FeatureEnvy extends ViewPart {
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(identifyBadSmellsAction);
+		manager.add(visualizeCandidatesAction);
 		manager.add(applyRefactoringAction);
 		manager.add(saveResultsAction);
 		//manager.add(evolutionAnalysisAction);
@@ -481,6 +542,25 @@ public class FeatureEnvy extends ViewPart {
 				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		identifyBadSmellsAction.setEnabled(false);
 
+		visualizeCandidatesAction = new Action(){
+			public void run(){
+				CodeSmellVisualizationDataSingleton.displayRefactoringDiagram = true;
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IViewPart viewPart = page.findView(CodeSmellVisualization.ID);
+				if(viewPart != null)
+					page.hideView(viewPart);
+				try {
+					page.showView(CodeSmellVisualization.ID);
+				} catch (PartInitException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		visualizeCandidatesAction.setToolTipText("Visualize Selected Candidates");
+		visualizeCandidatesAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
+		visualizeCandidatesAction.setEnabled(true);
+		
 		saveResultsAction = new Action() {
 			public void run() {
 				saveResults();
