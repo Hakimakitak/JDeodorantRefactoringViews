@@ -35,7 +35,6 @@ public class RefactoringDiagram {
 	private ScalableFreeformLayeredPane root;
 	private FreeformLayer primary;
 	private ConnectionLayer connections;
-	private List<JConnection> connectionList= new ArrayList<JConnection>();
 	private int bendGap;
 
 	int sourceClassWidth = 200;
@@ -240,7 +239,7 @@ public class RefactoringDiagram {
 			    sourceClassToolTip += "Conflicting Refactors:\n";
 			    sourceClassToolTip += tempM;
 			    sourceClassToolTip += tempF;
-			    sourceClassToolTip += "\n(Left-click to print to console.)\n=========================";
+			    sourceClassToolTip += "\n(Left-click to print to console.)\n====================";
 			    sourceClassFigure.setToolTip(new Label(sourceClassToolTip));
 			    
 			    
@@ -280,17 +279,17 @@ public class RefactoringDiagram {
 			        String extractClassToolTip = "Conflicting Refactors:\n";
 			        extractClassToolTip += tempM;
 			        extractClassToolTip += tempF;
-			        extractClassToolTip += "\n(Left-click to print to console.)\n=========================";
+			        extractClassToolTip += "\n(Left-click to print to console.)\n====================";
 			        int sourceClassX = classCoordinates.get(sourceClass)[0];
 			        JConnection connection;
 			        if(sourceClassX < extractClassX){
-			        	connection = sourceClassFigure.addRightLeftConnection(ConnectionType.READ_FIELD_TARGET, extractedClassFigure, label, extractClassToolTip);
+			        	connection = sourceClassFigure.addRightLeftConnection(ConnectionType.METHOD_CALL_SOURCE, extractedClassFigure, label, extractClassToolTip);
 			        } else if (sourceClassX > extractClassX){
 			        	connection = sourceClassFigure.addLeftRightConnection(ConnectionType.READ_FIELD_TARGET, extractedClassFigure, label, extractClassToolTip);
 			        } else {
 			        	connection = sourceClassFigure.addRightRightConnection(ConnectionType.READ_FIELD_TARGET, extractedClassFigure, label, extractClassToolTip, classWidth-classWidth/2/2);
 			        }
-			        connection.setReadStyle();
+			        setConnectionColor(validExtractClassEntities, invalidExtractClassEntities, connection);
 					connections.add(connection);
 					
 				}
@@ -365,7 +364,7 @@ public class RefactoringDiagram {
 								}
 							}
 							
-							moveMethodToolTip += "\n(Left-click to print to console.)\n=========================";
+							moveMethodToolTip += "\n(Left-click to print to console.)\n====================";
 							
 							String label = validMoveMethods + "/" + methods.size(); 
 							
@@ -379,7 +378,7 @@ public class RefactoringDiagram {
 					        } else {
 					        	connection = sourceClassFigure.addRightRightConnection(ConnectionType.READ_FIELD_TARGET, targetClassFigure, label, moveMethodToolTip, classWidth-classWidth/2/2);
 					        }
-					        connection.setReadStyle();
+					        setConnectionColor(validMoveMethods, methods.size()-validMoveMethods, connection);
 							connections.add(connection);
 						}
 						
@@ -395,6 +394,15 @@ public class RefactoringDiagram {
 		}
 	}
 	
+	private void setConnectionColor(int validEntities, int invalidEntities,
+			JConnection connection) {
+		if(invalidEntities == 0){
+	        connection.setMethodToMethodStyle();
+		} else if (validEntities <= (validEntities+invalidEntities)*.25){
+			connection.setWriteStyle();
+		} else connection.setReadStyle();
+	}
+
 	Rectangle getNewClassRectangle(){
 		int x = startGridX + (curGridX * (classWidth + xGap));
 		int y = startGridY + (curGridY * yGap);
