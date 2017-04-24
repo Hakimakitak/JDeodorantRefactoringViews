@@ -517,6 +517,7 @@ public class FeatureEnvy extends ViewPart {
 	private void makeActions() {
 		identifyBadSmellsAction = new Action() {
 			public void run() {
+				CodeSmellVisualizationDataSingleton.resetFeatureEnvyData();
 				//close the Code Smell Package Explorer, if it is already open
 				boolean wasAlreadyOpen = false;
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();

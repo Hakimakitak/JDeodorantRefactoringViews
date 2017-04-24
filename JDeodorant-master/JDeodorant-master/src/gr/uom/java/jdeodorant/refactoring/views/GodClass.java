@@ -31,6 +31,9 @@ import gr.uom.java.distance.Entity;
 import gr.uom.java.distance.ExtractClassCandidateRefactoring;
 import gr.uom.java.distance.ExtractClassCandidateGroup;
 import gr.uom.java.distance.ExtractedConcept;
+import gr.uom.java.distance.MyAttribute;
+import gr.uom.java.distance.MyClass;
+import gr.uom.java.distance.MyMethod;
 import gr.uom.java.distance.MySystem;
 import gr.uom.java.jdeodorant.preferences.PreferenceConstants;
 import gr.uom.java.jdeodorant.refactoring.Activator;
@@ -591,6 +594,7 @@ public class GodClass extends ViewPart {
 	private void makeActions() {
 		identifyBadSmellsAction = new Action() {
 			public void run() {
+				CodeSmellVisualizationDataSingleton.resetGodClassData();
 				boolean wasAlreadyOpen = false;
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IViewPart viewPart = page.findView(CodeSmellPackageExplorer.ID);
@@ -616,6 +620,27 @@ public class GodClass extends ViewPart {
 
 		visualizeCandidatesAction = new Action(){
 			public void run(){
+				//Testing
+				/*
+				MyClass sourceClass = new MyClass("ThreadsController");
+				ArrayList<Entity> entities = new ArrayList<Entity>();
+				Entity entity1 = new MyAttribute("ThreadsController", "long", "speed");
+				List<String> parameters = new ArrayList<String>();
+				Entity entity2 = new MyMethod("classname", "methodMethod", "void", parameters);
+				entities.add(entity1);
+				//entities.add(entity2);
+				SystemObject systemObject = ASTReader.getSystemObject();
+				MySystem system = new MySystem(systemObject, true);
+
+				ExtractClassCandidateRefactoring eccr = new ExtractClassCandidateRefactoring(system, sourceClass, entities);
+				ExtractClassCandidateGroup[] array = new ExtractClassCandidateGroup[1];
+				ExtractClassCandidateGroup group = new ExtractClassCandidateGroup(eccr.getSourceEntity());
+				array[0] = group;
+				
+				candidateRefactoringTable = array;
+				treeViewer.setContentProvider(new ViewContentProvider());
+				*/
+				
 				CodeSmellVisualizationDataSingleton.displayRefactoringDiagram = true;
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IViewPart viewPart = page.findView(CodeSmellVisualization.ID);
@@ -626,6 +651,7 @@ public class GodClass extends ViewPart {
 				} catch (PartInitException e) {
 					e.printStackTrace();
 				}
+				
 			}
 		};
 		visualizeCandidatesAction.setToolTipText("Visualize Selected Candidates");
@@ -899,13 +925,29 @@ public class GodClass extends ViewPart {
 				for(String sourceClass : groupedBySourceClassMap.keySet()) {
 					groupedBySourceClassMap.get(sourceClass).groupConcepts();
 				}
-
+				//Testing
+				/*
+				MyClass sourceClass = new MyClass("ThreadsController");
+				ArrayList<Entity> entities = new ArrayList<Entity>();
+				Entity entity1 = new MyAttribute("ThreadsController", "long", "speed");
+				List<String> parameters = new ArrayList<String>();
+				Entity entity2 = new MyMethod("classname", "methodMethod", "void", parameters);
+				entities.add(entity1);
+				
+				//entities.add(entity2);
+				
+				ExtractClassCandidateRefactoring eccr = new ExtractClassCandidateRefactoring(system, sourceClass, entities);
+				ExtractClassCandidateGroup[] array = new ExtractClassCandidateGroup[1];
+				ExtractClassCandidateGroup group = new ExtractClassCandidateGroup(eccr.getSourceEntity());
+				*/
+				
 				table = new ExtractClassCandidateGroup[groupedBySourceClassMap.values().size()];
 				int counter = 0;
 				for(ExtractClassCandidateGroup candidate : groupedBySourceClassMap.values()) {
 					table[counter] = candidate;
 					counter++;
 				}
+				//table[counter] = group;
 			}
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();

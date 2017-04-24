@@ -6,11 +6,16 @@ import java.util.List;
 
 import org.eclipse.draw2d.CompoundBorder;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.MarginBorder;
+import org.eclipse.draw2d.MouseEvent;
+import org.eclipse.draw2d.MouseListener;
+import org.eclipse.draw2d.ToolTipHelper;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Control;
 
 
 public class ClassFigure extends Figure {
@@ -19,6 +24,7 @@ public class ClassFigure extends Figure {
 	private CompartmentFigure extractMethodFigure = new CompartmentFigure();
 	private SectionCompartment methodSectionCompartment ;
 	private SectionCompartment fieldSectionCompartment = new SectionCompartment(3) ;
+	private Label label;
 	
 	public ClassFigure(String name, Color color) {
 		ToolbarLayout layout = new ToolbarLayout();
@@ -29,6 +35,7 @@ public class ClassFigure extends Figure {
 		setOpaque(true);
 
 		Label className = new Label(name, DecorationConstants.CLASS);
+		label = className;
 		//className.setToolTip(new Label(name));
 		className.setFont(DecorationConstants.classFont);
 
@@ -36,6 +43,10 @@ public class ClassFigure extends Figure {
 
 		new ClassFigureMover(this);
 
+	}
+	
+	public Label getLabel(){
+		return label;
 	}
 
 	public void addThreeCompartments(){
@@ -139,7 +150,7 @@ public class ClassFigure extends Figure {
 		return connection;
 	}
 
-	public JConnection addRightRightConnection(ConnectionType type, ClassFigure figure, Integer occurences, int bendHeight){
+	public JConnection addRightRightConnection(ConnectionType type, ClassFigure figure, String label, String toolTip, int bendHeight){
 
 		JConnection connection = new JConnection(type);
 
@@ -147,7 +158,21 @@ public class ClassFigure extends Figure {
 
 		//connection.setSourceBendRouter(-bendHeight, -classWidth);
 		connection.setFullBendRouter(-bendHeight);
-		connection.setLabel(occurences);
+		connection.setLabel(label);
+		
+		Label toolTipLabel = new Label(toolTip);
+		final String toolTipFinal = toolTip;
+		connection.getLabel().addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {
+				System.out.println(toolTipFinal);
+			}
+			public void mouseDoubleClicked(MouseEvent arg0) {}
+		});
+		
+		connection.setToolTip(toolTipLabel);
+		
+		
 		outgoingConnections.add(connection);
 
 
@@ -159,19 +184,39 @@ public class ClassFigure extends Figure {
 		JConnection connection = new JConnection(type);
 		connection.setRightLeftAnchors(this, figure);
 		connection.setLabel(label);
-		connection.setToolTip(new Label(toolTip));
+		Label toolTipLabel = new Label(toolTip);
+		final String toolTipFinal = toolTip;
+		
+		connection.getLabel().addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {
+				System.out.println(toolTipFinal);
+			}
+			public void mouseDoubleClicked(MouseEvent arg0) {}
+		});
+		connection.setToolTip(toolTipLabel);
 		
 		outgoingConnections.add(connection);
 		return connection;
 	}
 
-	public JConnection addLeftRightConnection(ConnectionType type, ClassFigure figure, Integer occurences){
+	public JConnection addLeftRightConnection(ConnectionType type, ClassFigure figure, String label, String toolTip){
 
 		JConnection connection = new JConnection(type);
 
 		connection.setLeftRightAnchors(this, figure);
 
-		connection.setLabel(occurences);
+		connection.setLabel(label);
+		Label toolTipLabel = new Label(toolTip);
+		final String toolTipFinal = toolTip;
+		connection.getLabel().addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {
+				System.out.println(toolTipFinal);
+			}
+			public void mouseDoubleClicked(MouseEvent arg0) {}
+		});
+		connection.setToolTip(toolTipLabel);
 		
 		outgoingConnections.add(connection);
 		return connection;

@@ -56,6 +56,10 @@ public class CodeSmellVisualizationDataSingleton {
 		return featureEnvyData.size();
 	}
 	
+	public static int countAllCandidates(){
+		return godClassData.size() + featureEnvyData.size();
+	}
+	
 	public static CandidateRefactoring[] getCandidates() {
 		return candidates;
 	}
@@ -70,5 +74,18 @@ public class CodeSmellVisualizationDataSingleton {
 
 	public static void setData(VisualizationData data) {
 		CodeSmellVisualizationDataSingleton.data = data;
+	}
+
+	public static void resetSelectedCandidates() {
+		godClassData = new ArrayList<GodClassVisualizationData>();
+		featureEnvyData = new ArrayList<FeatureEnvyVisualizationData>();
+	}
+	
+	public static void resetGodClassData(){
+		godClassData = new ArrayList<GodClassVisualizationData>();
+	}
+	
+	public static void resetFeatureEnvyData(){
+		featureEnvyData = new ArrayList<FeatureEnvyVisualizationData>();
 	}
 }
