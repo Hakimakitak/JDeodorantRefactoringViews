@@ -200,7 +200,7 @@ public class CodeSmellVisualization extends ViewPart {
 		};
 		importRefactors.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OPEN_MARKER));
-		manager.add(importRefactors);
+		//manager.add(importRefactors);
 		
 	}
 	
