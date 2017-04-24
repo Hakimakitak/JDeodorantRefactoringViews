@@ -1,5 +1,10 @@
 package gr.uom.java.jdeodorant.refactoring.views;
 
+import gr.uom.java.ast.ClassObject;
+import gr.uom.java.ast.ConstructorObject;
+import gr.uom.java.ast.FieldObject;
+import gr.uom.java.ast.MethodObject;
+import gr.uom.java.ast.TypeObject;
 import gr.uom.java.ast.visualization.FeatureEnvyDiagram;
 import gr.uom.java.ast.visualization.FeatureEnvyVisualizationData;
 import gr.uom.java.ast.visualization.GodClassDiagram2;
@@ -9,6 +14,14 @@ import gr.uom.java.ast.visualization.ZoomInputAction;
 import gr.uom.java.ast.visualization.VisualizationData;
 import gr.uom.java.ast.visualization.ZoomAction;
 import gr.uom.java.jdeodorant.refactoring.Activator;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.FigureCanvas;
@@ -31,9 +44,16 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class CodeSmellVisualization extends ViewPart {
 
@@ -137,6 +157,87 @@ public class CodeSmellVisualization extends ViewPart {
 		act.setImageDescriptor(imageDescriptor);
 		act.setMenuCreator(new MyMenuCreator());
 		manager.add(act);
+		
+		
+		
+		
+		///
+		
+		Action importRefactors = new Action("Import refactors") {
+			public void run(){
+		        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+				   dialog.setFilterExtensions(new String [] {"*.csv"});
+				   dialog.setFilterPath("c:\\temp");
+				   String result = dialog.open();
+				   
+				   File outFile = new File(result);
+					DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder dBuilder;
+					try {
+						dBuilder = dbFactory.newDocumentBuilder();
+						Document doc = dBuilder.parse(outFile);
+						NodeList nList = doc.getElementsByTagName("Metric");
+						for(int i=0; i<nList.getLength(); i++){
+							NodeList children1 = nList.item(i).getChildNodes();
+							for(int j=0; i<children1.getLength(); j++){
+								if(children1.item(j).getNodeName().equals("Values")){
+									int k = 0;
+								}
+							}
+						}
+					} catch (ParserConfigurationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SAXException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			};
+		};
+		importRefactors.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+				.getImageDescriptor(ISharedImages.IMG_OPEN_MARKER));
+		manager.add(importRefactors);
+		
+	}
+	
+	public FieldObject createFieldObject(String type, String name){
+		TypeObject typeObject = new TypeObject(type);
+		FieldObject field = new FieldObject(typeObject, name);
+		return field;
+	}
+	
+	
+	
+	public GodClassVisualizationData createGodClassData(String className, HashSet<String> extractedMethodStrings, HashSet<FieldObject> extractedFields){
+		ClassObject sourceClass = new ClassObject();
+		sourceClass.setName(className);
+		HashSet<MethodObject> extractedMethods = new HashSet<MethodObject>();
+		for(String methodString : extractedMethodStrings){
+			ConstructorObject co = new ConstructorObject();
+			co.setClassName(className);
+			co.setName(methodString);
+			MethodObject method = new MethodObject(co);
+			extractedMethods.add(method);
+		}
+		
+		GodClassVisualizationData data = new GodClassVisualizationData(sourceClass, extractedMethods, extractedFields);
+		return data;
+	}
+	
+	public void createFatureEnvyVisualizationData(String sourceClassName, String targetClassName, String methodName){
+		ClassObject sourceClass = new ClassObject();
+		sourceClass.setName(sourceClassName);
+		ClassObject targetClass = new ClassObject();
+		targetClass.setName(targetClassName);
+		ConstructorObject co = new ConstructorObject();
+		co.setClassName(sourceClassName);
+		co.setName(methodName);
+		MethodObject methodToBeMoved = new MethodObject(co);
+		FeatureEnvyVisualizationData data = new FeatureEnvyVisualizationData(sourceClass, methodToBeMoved, targetClass);
 	}
 
 

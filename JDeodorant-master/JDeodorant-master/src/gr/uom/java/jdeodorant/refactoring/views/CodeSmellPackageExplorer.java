@@ -182,45 +182,7 @@ public class CodeSmellPackageExplorer extends ViewPart {
 		searchAction.setText("Search");
 		manager.add(searchAction);
 		
-		///
 		
-		Action importXML = new Action("Import metrics") {
-			public void run(){
-		        Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-				FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-				   dialog.setFilterExtensions(new String [] {"*.xml"});
-				   dialog.setFilterPath("c:\\temp");
-				   String result = dialog.open();
-				   
-				   File outFile = new File(result);
-					DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder dBuilder;
-					try {
-						dBuilder = dbFactory.newDocumentBuilder();
-						Document doc = dBuilder.parse(outFile);
-						NodeList nList = doc.getElementsByTagName("Metric");
-						for(int i=0; i<nList.getLength(); i++){
-							NodeList children1 = nList.item(i).getChildNodes();
-							for(int j=0; i<children1.getLength(); j++){
-								if(children1.item(j).getNodeName().equals("Values")){
-									int k = 0;
-								}
-							}
-						}
-					} catch (ParserConfigurationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SAXException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			};
-		};
-		importXML.setText("Import metrics");
-		manager.add(importXML);
 
 	}
 
