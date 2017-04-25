@@ -192,6 +192,7 @@ public class RefactoringDiagram {
 				
 				String invalidMethods = "";
 				String invalidFields = "";
+				String invalidExtractMethods = "";
 				
 				int validExtractClassEntities = 0;
 			    int invalidExtractClassEntities = 0;
@@ -204,21 +205,35 @@ public class RefactoringDiagram {
 			        Integer methodCount = methodPair.getValue();
 			        if(methodCount > 1){
 			        	invalidExtractClassEntities++;
-			        	invalidMethods += "\n" + method + ": ";
 			        	boolean extracted = extractedMethods.containsKey(methodPair.getKey());
 			        	boolean moved = movedMethods.containsKey(method);
+			        	invalidMethods += "\n" + method + ": ";
 			        	if(extracted){
+				        	invalidExtractMethods += "\n" + method + ": ";
 			        		int extractCount = extractedMethods.get(method);
-			        		if(extractCount == 1) invalidMethods +=  extractCount + " Extract Class Refactor";
-							else if(extractCount > 1) invalidMethods += extractCount + " Extract Class Refactors";
+			        		if(extractCount == 1) {
+			        			invalidMethods +=  extractCount + " Extract Class Refactor";
+			        			invalidExtractMethods+=  extractCount + " Extract Class Refactor";
+			        		}
+							else if(extractCount > 1) {
+								invalidMethods += extractCount + " Extract Class Refactors";
+								invalidExtractMethods+=  extractCount + " Extract Class Refactor";
+							}
 			        		if(moved){
 			        			invalidMethods += ", ";
 			        		}
 			        	}
 			        	if(moved){
 			        		int movedCount = movedMethods.get(method);
-			        		if(movedCount == 1) invalidMethods += movedCount + " Move Method Refactor";
-							else if(movedCount > 1) invalidMethods += movedCount + " Move Method Refactors";
+			        		if(movedCount == 1) {
+			        			invalidMethods += movedCount + " Move Method Refactor";
+			        			if(extracted) invalidExtractMethods += movedCount + " Move Method Refactor";
+			        		}
+							else if(movedCount > 1) {
+								invalidMethods += movedCount + " Move Method Refactors";
+								if(extracted) invalidExtractMethods += movedCount + " Move Method Refactors";
+							}
+			        		
 			        	}
 			        	
 			        } else {
@@ -236,6 +251,7 @@ public class RefactoringDiagram {
 			        String field = fieldPair.getKey();
 			        Integer fieldCount = fieldPair.getValue();
 			        if(fieldCount > 1){
+			        	invalidExtractClassEntities++;
 				        //We only have one form of manipulating fields at the moment
 			        	invalidFields += "\n";
 				        invalidFields += field + ": ";
@@ -244,6 +260,7 @@ public class RefactoringDiagram {
 				        
 			        } else {
 			        	extractedFieldsStrings += "\n" + field;
+			        	validExtractClassEntities++;
 			        }
 			    	//fieldIterator.remove();
 			    }
@@ -297,11 +314,30 @@ public class RefactoringDiagram {
 					
 					primary.add(extractedClassFigure, getNewClassRectangle());
 			        
+					/*
+					 * if(!extractedFieldsStrings.isEmpty()) sourceClassToolTip += "\nExtracted Fields:" + extractedFieldsStrings + "\n";
+					    if(!extractedMethodsStrings.isEmpty()) sourceClassToolTip += "\nExtracted Methods:" + extractedMethodsStrings + "\n";
+					    if(!movedMethodsStrings.isEmpty()) sourceClassToolTip += "\nMoved Methods:" + movedMethodsStrings + "\n";
+					    
+					    if(!invalidFields.isEmpty() || !invalidMethods.isEmpty()) sourceClassToolTip += "\n\n==Conflicting Refactors:==";
+					    if(!invalidMethods.isEmpty()) sourceClassToolTip += "\n\nMethods:" + invalidMethods;
+					    if(!invalidFields.isEmpty()) sourceClassToolTip += "\n\nFields:" +invalidFields;
+					 */
+					
+					
 			        String label = validExtractClassEntities + "/" + (validExtractClassEntities+invalidExtractClassEntities);
-			        String extractClassToolTip = "Conflicting Refactors:\n";
-			        extractClassToolTip += invalidMethods;
-			        extractClassToolTip += invalidFields;
-			        extractClassToolTip += "\n(Double-click to print to console.)\n====================";
+			        String extractClassToolTip = "";
+			        extractClassToolTip += "(Double-click to print to console.)\n====================\n";
+			        extractClassToolTip += "source: " + sourceClass.getName() + "\n";
+			        extractClassToolTip += "target: Extracted Class\n";
+			        
+			        if(!extractedFieldsStrings.isEmpty()) extractClassToolTip += "\nExtracted Fields:" + extractedFieldsStrings + "\n";
+				    if(!extractedMethodsStrings.isEmpty()) extractClassToolTip += "\nExtracted Methods:" + extractedMethodsStrings + "\n";
+			        
+				    if(!invalidFields.isEmpty() || !invalidExtractMethods.isEmpty()) extractClassToolTip += "\n\n==Conflicting Refactors:==";
+				    if(!invalidExtractMethods.isEmpty()) extractClassToolTip += "\n\nMethods:" + invalidMethods;
+				    if(!invalidFields.isEmpty()) extractClassToolTip += "\n\nFields:" +invalidFields;
+				    
 			        int sourceClassX = classCoordinates.get(sourceClass)[0];
 			        JConnection connection;
 			        if(sourceClassX < extractClassX){
@@ -359,36 +395,61 @@ public class RefactoringDiagram {
 							}
 							
 							
-							String moveMethodToolTip = "Conflicting Refactors:\n";
+							
+
+							String validMethodStrings = "";
+							String invalidMethodStrings = "";
+							
 							int validMoveMethods = 0;
 							for(String method : methods){
 								int count = allRefactoredMethods.get(method);
 								if(count > 1){
-									moveMethodToolTip += method + ": ";
+									invalidMethodStrings += method + ": ";
 						        	boolean extracted = extractedMethods.containsKey(method);
 						        	boolean moved = movedMethods.containsKey(method);
 						        	if(extracted){
 						        		int extractCount = extractedMethods.get(method);
-						        		if(extractCount == 1) moveMethodToolTip += extractCount + " Extract Class Refactor";
-										else if(extractCount > 1) moveMethodToolTip += extractCount + " Extract Class Refactors";
+						        		if(extractCount == 1) invalidMethodStrings += extractCount + " Extract Class Refactor";
+										else if(extractCount > 1) invalidMethodStrings += extractCount + " Extract Class Refactors";
 						        		if(moved){
-						        			moveMethodToolTip += ", ";
+						        			invalidMethodStrings += ", ";
 						        		}
 						        	}
 						        	if(moved){
 						        		int movedCount = movedMethods.get(method);
-						        		if(movedCount == 1) moveMethodToolTip += movedCount + " Move Method Refactor";
-										else if(movedCount > 1) moveMethodToolTip += movedCount + " Move Method Refactors";
+						        		if(movedCount == 1) invalidMethodStrings += movedCount + " Move Method Refactor";
+										else if(movedCount > 1) invalidMethodStrings += movedCount + " Move Method Refactors";
 						        	}
-						        	moveMethodToolTip += "\n";
+						        	invalidMethodStrings += "\n";
 								} else {
+									validMethodStrings += method + "\n";
 									validMoveMethods++;
 								}
 							}
 							
-							moveMethodToolTip += "\n(Double-click to print to console.)\n====================";
 							
 							String label = validMoveMethods + "/" + methods.size(); 
+							
+							String moveMethodToolTip = "";
+							moveMethodToolTip += "(Double-click to print to console.)\n====================\n";
+							
+							moveMethodToolTip += "source: " + sourceClass.getName() + "\n";
+					        moveMethodToolTip += "target: " + targetClass.getName() + "\n";
+							
+							if(!validMethodStrings.isEmpty()) moveMethodToolTip += "\nMoved Methods:\n" + validMethodStrings;
+							if(!invalidMethodStrings.isEmpty()) {
+								moveMethodToolTip += "\n==Conflicting Refactors:==\n";
+								moveMethodToolTip += invalidMethodStrings;
+							}
+							
+							/*
+							 * if(!extractedFieldsStrings.isEmpty()) extractClassToolTip += "\nExtracted Fields:" + extractedFieldsStrings + "\n";
+				    if(!extractedMethodsStrings.isEmpty()) extractClassToolTip += "\nExtracted Methods:" + extractedMethodsStrings + "\n";
+			        
+				    if(!invalidFields.isEmpty() || !invalidExtractMethods.isEmpty()) extractClassToolTip += "\n\n==Conflicting Refactors:==";
+				    if(!invalidExtractMethods.isEmpty()) extractClassToolTip += "\n\nMethods:" + invalidMethods;
+				    if(!invalidFields.isEmpty()) extractClassToolTip += "\n\nFields:" +invalidFields;
+							 */
 							
 							int sourceClassX = classCoordinates.get(sourceClass)[0];
 							int targetClassX = classCoordinates.get(targetClass)[0];
