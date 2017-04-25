@@ -156,6 +156,12 @@ public class RefactoringDiagram {
 								count++;
 								extractedFields.put(field, count);
 							} else extractedFields.put(field, 1);
+							//
+							if(allRefactoredFields.containsKey(field)){
+								int count = allRefactoredFields.get(field);
+								count++;
+								allRefactoredFields.put(field, count);
+							} else {allRefactoredFields.put(field, 1);}
 						}
 					}
 				}
@@ -180,9 +186,12 @@ public class RefactoringDiagram {
 					}
 				}
 				
+				String extractedMethodsStrings = "";
+				String extractedFieldsStrings = "";
+				String movedMethodsStrings = "";
 				
-				String tempM = "\nMethods:\n";
-				String tempF = "\nFields:\n";
+				String invalidMethods = "";
+				String invalidFields = "";
 				
 				int validExtractClassEntities = 0;
 			    int invalidExtractClassEntities = 0;
@@ -195,25 +204,27 @@ public class RefactoringDiagram {
 			        Integer methodCount = methodPair.getValue();
 			        if(methodCount > 1){
 			        	invalidExtractClassEntities++;
-			        	tempM += method + ": ";
+			        	invalidMethods += "\n" + method + ": ";
 			        	boolean extracted = extractedMethods.containsKey(methodPair.getKey());
 			        	boolean moved = movedMethods.containsKey(method);
 			        	if(extracted){
 			        		int extractCount = extractedMethods.get(method);
-			        		if(extractCount == 1) tempM += extractCount + " Extract Class Refactor";
-							else if(extractCount > 1) tempM += extractCount + " Extract Class Refactors";
+			        		if(extractCount == 1) invalidMethods +=  extractCount + " Extract Class Refactor";
+							else if(extractCount > 1) invalidMethods += extractCount + " Extract Class Refactors";
 			        		if(moved){
-			        			tempM += ", ";
+			        			invalidMethods += ", ";
 			        		}
 			        	}
 			        	if(moved){
 			        		int movedCount = movedMethods.get(method);
-			        		if(movedCount == 1) tempM += movedCount + " Move Method Refactor";
-							else if(movedCount > 1) tempM += movedCount + " Move Method Refactors";
+			        		if(movedCount == 1) invalidMethods += movedCount + " Move Method Refactor";
+							else if(movedCount > 1) invalidMethods += movedCount + " Move Method Refactors";
 			        	}
-			        	tempM += "\n";
+			        	
 			        } else {
 			        	validExtractClassEntities++;
+			        	if(extractedMethods.containsKey(method)) extractedMethodsStrings += "\n" + method;
+			        	else if (movedMethods.containsKey(method)) movedMethodsStrings += "\n" + method;
 			        }
 			        //methodIterator.remove(); // avoids a ConcurrentModificationException
 			    }
@@ -226,20 +237,30 @@ public class RefactoringDiagram {
 			        Integer fieldCount = fieldPair.getValue();
 			        if(fieldCount > 1){
 				        //We only have one form of manipulating fields at the moment
-				        tempF += field;
-				        if(fieldCount == 1) tempM += fieldCount + " Extract Class Refactor";
-						else if(fieldCount > 1) tempM += fieldCount + " Extract Class Refactors";
-				        tempF += "\n";
+			        	invalidFields += "\n";
+				        invalidFields += field + ": ";
+				        if(fieldCount == 1) invalidFields += fieldCount + " Extract Class Refactor";
+						else if(fieldCount > 1) invalidFields += fieldCount + " Extract Class Refactors";
+				        
+			        } else {
+			        	extractedFieldsStrings += "\n" + field;
 			        }
 			    	//fieldIterator.remove();
 			    }
 
 				//update the tooltip
-			    String sourceClassToolTip = sourceClass.getName() + "\n\n";
-			    sourceClassToolTip += "Conflicting Refactors:\n";
-			    sourceClassToolTip += tempM;
-			    sourceClassToolTip += tempF;
-			    sourceClassToolTip += "\n(Left-click to print to console.)\n====================";
+			    String sourceClassToolTip = "";
+			    sourceClassToolTip += "(Double-click to print to console.)\n====================\n";
+
+			    sourceClassToolTip += sourceClass.getName() + "\n";
+			    
+			    if(!extractedFieldsStrings.isEmpty()) sourceClassToolTip += "\nExtracted Fields:" + extractedFieldsStrings + "\n";
+			    if(!extractedMethodsStrings.isEmpty()) sourceClassToolTip += "\nExtracted Methods:" + extractedMethodsStrings + "\n";
+			    if(!movedMethodsStrings.isEmpty()) sourceClassToolTip += "\nMoved Methods:" + movedMethodsStrings + "\n";
+			    
+			    if(!invalidFields.isEmpty() || !invalidMethods.isEmpty()) sourceClassToolTip += "\n\n==Conflicting Refactors:==";
+			    if(!invalidMethods.isEmpty()) sourceClassToolTip += "\n\nMethods:" + invalidMethods;
+			    if(!invalidFields.isEmpty()) sourceClassToolTip += "\n\nFields:" +invalidFields;
 			    sourceClassFigure.setToolTip(new Label(sourceClassToolTip));
 			    
 			    
@@ -251,9 +272,10 @@ public class RefactoringDiagram {
 				    sourceClassFigure.getLabel().addMouseListener(new MouseListener() {
 						public void mouseReleased(MouseEvent arg0) {}
 						public void mousePressed(MouseEvent arg0) {
+						}
+						public void mouseDoubleClicked(MouseEvent arg0) {
 							System.out.println(sourceClassToolTipFinal);
 						}
-						public void mouseDoubleClicked(MouseEvent arg0) {}
 					});
 					primary.add(sourceClassFigure, getNewClassRectangle());
 					drawnClasses.add(sourceClass);
@@ -277,9 +299,9 @@ public class RefactoringDiagram {
 			        
 			        String label = validExtractClassEntities + "/" + (validExtractClassEntities+invalidExtractClassEntities);
 			        String extractClassToolTip = "Conflicting Refactors:\n";
-			        extractClassToolTip += tempM;
-			        extractClassToolTip += tempF;
-			        extractClassToolTip += "\n(Left-click to print to console.)\n====================";
+			        extractClassToolTip += invalidMethods;
+			        extractClassToolTip += invalidFields;
+			        extractClassToolTip += "\n(Double-click to print to console.)\n====================";
 			        int sourceClassX = classCoordinates.get(sourceClass)[0];
 			        JConnection connection;
 			        if(sourceClassX < extractClassX){
@@ -364,7 +386,7 @@ public class RefactoringDiagram {
 								}
 							}
 							
-							moveMethodToolTip += "\n(Left-click to print to console.)\n====================";
+							moveMethodToolTip += "\n(Double-click to print to console.)\n====================";
 							
 							String label = validMoveMethods + "/" + methods.size(); 
 							

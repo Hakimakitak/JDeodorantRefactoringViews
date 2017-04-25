@@ -165,9 +165,8 @@ public class ClassFigure extends Figure {
 		connection.getLabel().addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent arg0) {}
 			public void mousePressed(MouseEvent arg0) {
-				System.out.println(toolTipFinal);
 			}
-			public void mouseDoubleClicked(MouseEvent arg0) {}
+			public void mouseDoubleClicked(MouseEvent arg0) {System.out.println(toolTipFinal);}
 		});
 		
 		connection.setToolTip(toolTipLabel);
@@ -190,9 +189,9 @@ public class ClassFigure extends Figure {
 		connection.getLabel().addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent arg0) {}
 			public void mousePressed(MouseEvent arg0) {
-				System.out.println(toolTipFinal);
+				
 			}
-			public void mouseDoubleClicked(MouseEvent arg0) {}
+			public void mouseDoubleClicked(MouseEvent arg0) {System.out.println(toolTipFinal);}
 		});
 		connection.setToolTip(toolTipLabel);
 		
@@ -212,9 +211,9 @@ public class ClassFigure extends Figure {
 		connection.getLabel().addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent arg0) {}
 			public void mousePressed(MouseEvent arg0) {
-				System.out.println(toolTipFinal);
+				
 			}
-			public void mouseDoubleClicked(MouseEvent arg0) {}
+			public void mouseDoubleClicked(MouseEvent arg0) {System.out.println(toolTipFinal);}
 		});
 		connection.setToolTip(toolTipLabel);
 		
