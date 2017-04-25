@@ -114,6 +114,7 @@ public class FeatureEnvy extends ViewPart {
 	private Action doubleClickAction;
 	private Action saveResultsAction;
 	private Action packageExplorerAction;
+	private Action clearSelectionsAction;
 	//private Action evolutionAnalysisAction;
 	private IJavaProject selectedProject;
 	private IJavaProject activeProject;
@@ -508,6 +509,7 @@ public class FeatureEnvy extends ViewPart {
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(identifyBadSmellsAction);
 		manager.add(visualizeCandidatesAction);
+		manager.add(clearSelectionsAction);
 		manager.add(applyRefactoringAction);
 		manager.add(saveResultsAction);
 		//manager.add(evolutionAnalysisAction);
@@ -561,6 +563,18 @@ public class FeatureEnvy extends ViewPart {
 		visualizeCandidatesAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
 		visualizeCandidatesAction.setEnabled(true);
+		
+		clearSelectionsAction = new Action() {
+			public void run(){
+				CodeSmellVisualizationDataSingleton.resetGodClassData();
+				tableViewer.refresh();
+			}
+		};
+		clearSelectionsAction.setToolTipText("Clear Selected Candidates");
+		clearSelectionsAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVEALL));
+		clearSelectionsAction.setEnabled(true);
+		
+		
 		
 		saveResultsAction = new Action() {
 			public void run() {

@@ -114,6 +114,7 @@ public class GodClass extends ViewPart {
 	private Action saveResultsAction;
 	private Action packageExplorerAction;
 	private Action visualizeCandidatesAction;
+	private Action clearSelectionsAction;
 	private ExtractClassCandidateGroup[] candidateRefactoringTable;
 	private IJavaProject selectedProject;
 	private IJavaProject activeProject;
@@ -586,6 +587,7 @@ public class GodClass extends ViewPart {
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(identifyBadSmellsAction);
 		manager.add(visualizeCandidatesAction);
+		manager.add(clearSelectionsAction);
 		manager.add(applyRefactoringAction);
 		manager.add(saveResultsAction);
 		manager.add(packageExplorerAction);
@@ -594,7 +596,6 @@ public class GodClass extends ViewPart {
 	private void makeActions() {
 		identifyBadSmellsAction = new Action() {
 			public void run() {
-				CodeSmellVisualizationDataSingleton.resetGodClassData();
 				boolean wasAlreadyOpen = false;
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IViewPart viewPart = page.findView(CodeSmellPackageExplorer.ID);
@@ -620,27 +621,7 @@ public class GodClass extends ViewPart {
 
 		visualizeCandidatesAction = new Action(){
 			public void run(){
-				//Testing
-				/*
-				MyClass sourceClass = new MyClass("ThreadsController");
-				ArrayList<Entity> entities = new ArrayList<Entity>();
-				Entity entity1 = new MyAttribute("ThreadsController", "long", "speed");
-				List<String> parameters = new ArrayList<String>();
-				Entity entity2 = new MyMethod("classname", "methodMethod", "void", parameters);
-				entities.add(entity1);
-				//entities.add(entity2);
-				SystemObject systemObject = ASTReader.getSystemObject();
-				MySystem system = new MySystem(systemObject, true);
-
-				ExtractClassCandidateRefactoring eccr = new ExtractClassCandidateRefactoring(system, sourceClass, entities);
-				ExtractClassCandidateGroup[] array = new ExtractClassCandidateGroup[1];
-				ExtractClassCandidateGroup group = new ExtractClassCandidateGroup(eccr.getSourceEntity());
-				array[0] = group;
-				
-				candidateRefactoringTable = array;
-				treeViewer.setContentProvider(new ViewContentProvider());
-				*/
-				
+								
 				CodeSmellVisualizationDataSingleton.displayRefactoringDiagram = true;
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				IViewPart viewPart = page.findView(CodeSmellVisualization.ID);
@@ -658,6 +639,17 @@ public class GodClass extends ViewPart {
 		visualizeCandidatesAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT));
 		visualizeCandidatesAction.setEnabled(true);
+		
+		clearSelectionsAction = new Action() {
+			public void run(){
+				CodeSmellVisualizationDataSingleton.resetGodClassData();
+				treeViewer.refresh();
+			}
+		};
+		clearSelectionsAction.setToolTipText("Clear Selected Candidates");
+		clearSelectionsAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVEALL));
+		clearSelectionsAction.setEnabled(true);
+		
 		
 		saveResultsAction = new Action() {
 			public void run() {
