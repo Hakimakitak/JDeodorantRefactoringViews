@@ -121,7 +121,9 @@ public class FieldObject extends VariableDeclarationObject {
     		result = 37*result + className.hashCode();
     		result = 37*result + name.hashCode();
     		result = 37*result + type.hashCode();
+    		if(variableBindingKey != null){
     		result = 37*result + variableBindingKey.hashCode();
+    		}
     		hashCode = result;
     	}
     	return hashCode;
