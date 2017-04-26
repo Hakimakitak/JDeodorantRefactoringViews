@@ -21,6 +21,7 @@ import org.eclipse.draw2d.ScalableFreeformLayeredPane;
 import org.eclipse.draw2d.ToolTipHelper;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.console.MessageConsoleStream;
 
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 
@@ -291,7 +292,8 @@ public class RefactoringDiagram {
 						public void mousePressed(MouseEvent arg0) {
 						}
 						public void mouseDoubleClicked(MouseEvent arg0) {
-							System.out.println(sourceClassToolTipFinal);
+							MessageConsoleStream out = CodeSmellVisualizationDataSingleton.findConsole("refactoring console").newMessageStream();
+							out.println(sourceClassToolTipFinal);
 						}
 					});
 					primary.add(sourceClassFigure, getNewClassRectangle());

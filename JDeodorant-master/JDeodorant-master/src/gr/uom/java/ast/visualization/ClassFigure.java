@@ -16,6 +16,9 @@ import org.eclipse.draw2d.ToolTipHelper;
 import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.console.MessageConsoleStream;
+
+import gr.uom.java.jdeodorant.refactoring.views.CodeSmellVisualizationDataSingleton;
 
 
 public class ClassFigure extends Figure {
@@ -166,7 +169,10 @@ public class ClassFigure extends Figure {
 			public void mouseReleased(MouseEvent arg0) {}
 			public void mousePressed(MouseEvent arg0) {
 			}
-			public void mouseDoubleClicked(MouseEvent arg0) {System.out.println(toolTipFinal);}
+			public void mouseDoubleClicked(MouseEvent arg0) {
+				MessageConsoleStream out = CodeSmellVisualizationDataSingleton.findConsole("refactoring console").newMessageStream();
+				out.println(toolTipFinal);
+			}
 		});
 		
 		connection.setToolTip(toolTipLabel);
@@ -191,7 +197,10 @@ public class ClassFigure extends Figure {
 			public void mousePressed(MouseEvent arg0) {
 				
 			}
-			public void mouseDoubleClicked(MouseEvent arg0) {System.out.println(toolTipFinal);}
+			public void mouseDoubleClicked(MouseEvent arg0) {
+				MessageConsoleStream out = CodeSmellVisualizationDataSingleton.findConsole("refactoring console").newMessageStream();
+				out.println(toolTipFinal);
+			}
 		});
 		connection.setToolTip(toolTipLabel);
 		
@@ -213,7 +222,10 @@ public class ClassFigure extends Figure {
 			public void mousePressed(MouseEvent arg0) {
 				
 			}
-			public void mouseDoubleClicked(MouseEvent arg0) {System.out.println(toolTipFinal);}
+			public void mouseDoubleClicked(MouseEvent arg0) {
+				MessageConsoleStream out = CodeSmellVisualizationDataSingleton.findConsole("refactoring console").newMessageStream();
+				out.println(toolTipFinal);
+			}
 		});
 		connection.setToolTip(toolTipLabel);
 		
